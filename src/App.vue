@@ -1,52 +1,59 @@
 <template>
   <div id="app">
-    <full-page :options="options" id="fullpage">
-      <div class="section">
+    <full-page :options="options" id="fullpage" v-if="isLoaded">
+      <div
+        v-for="preveningThought in preveningThoughts"
+        :key="preveningThought.data.id"
+        class="section"
+      >
         <div class="container">
           <img src="./assets/shower.png" alt="prevening icon" />
 
           <div class="quote-symbol">❝</div>
           <p class="quote">
-            <a href="#">Quote Goes Here</a>
+            <a target="_blank" :href="preveningThought.data.url">{{ preveningThought.data.title }}</a>
           </p>
           <div class="quote-symbol">❞</div>
           <div class="details">
-            <div class="details-author">Author</div>
-            <div class="stats">1234 upvotes</div>
+            <div class="details-author">Author: {{ preveningThought.data.author_fullname }}</div>
+            <div
+              class="stats"
+            >{{ preveningThought.data.ups }} upvotes | {{ preveningThought.data.num_comments }} Comments</div>
           </div>
         </div>
       </div>
       <!-- ❝❞ -->
-
-      <div class="section">
-        <h3>Section 2</h3>
-      </div>
-
-      <div class="section">
-        <h3>Section 3</h3>
-      </div>
     </full-page>
+
+    <div class="quote-symbol section container" v-else>
+      <loading-spinner></loading-spinner>
+    </div>
   </div>
 </template>
 
 <script>
-// import HelloWorld from './components/HelloWorld.vue'
+import LoadingSpinner from "./components/LoadingSpinner.vue";
 
 export default {
   name: "App",
-  // components: {
-  //   HelloWorld
-  // }
+  components: {
+    LoadingSpinner
+  },
+  created() {
+    fetch("https://www.reddit.com/r/Showerthoughts.json?limit=20")
+      .then(response => response.json())
+      .then(data => {
+        this.preveningThoughts = data.data.children;
+        this.preveningThoughts.shift();
+        this.isLoaded = true;
+      });
+  },
   data() {
     return {
+      isLoaded: false,
+      preveningThoughts: [],
       options: {
-        licenseKey: "YOUR_KEY_HERE",
-        afterLoad: this.afterLoad,
-        scrollOverflow: true,
-        scrollBar: false,
-        menu: "#menu",
-        navigation: true,
-        anchors: ["page1", "page2", "page3"],
+        scrollBar: true,
         sectionsColor: [
           "#41b883",
           "#ff5f45",
@@ -56,7 +63,18 @@ export default {
           "#ee1a59",
           "#2c3e4f",
           "#ba5be9",
-          "#b4b8ab"
+          "#b4b8ab",
+          "#41b883",
+          "#ff5f45",
+          "#0798ec",
+          "#fec401",
+          "#1bcee6",
+          "#ee1a59",
+          "#2c3e4f",
+          "#ba5be9",
+          "#0798ec",
+          "#0798ec",
+          "#fec401"
         ]
       }
     };
@@ -65,7 +83,7 @@ export default {
 </script>
 
 <style>
-@import url("https://fonts.googleapis.com/css2?family=Homemade+Apple&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Knewave&display=swap");
 
 #app {
   font-family: sans-serif;
@@ -100,7 +118,7 @@ h3 {
 
 .quote a {
   text-decoration: none;
-  font-family: "Homemade Apple", cursive;
+  font-family: "Knewave", cursive;
   color: white;
   font-size: 36px;
   line-height: 1.5;
@@ -110,6 +128,9 @@ h3 {
   color: #edf2f7;
 }
 
+.details {
+  margin-top: 2rem;
+}
 .details-stats {
   margin-top: 4px;
 }
